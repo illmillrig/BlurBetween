@@ -6,4 +6,5 @@ this needs to be used and tested much more since we're still animating in XSI an
 
 
 import blurBetweenUI
+
 blurBetweenUI.run()
