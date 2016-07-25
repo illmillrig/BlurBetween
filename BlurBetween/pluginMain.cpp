@@ -1,32 +1,51 @@
 
+#include "BlurTweenUI.h"
 #include "BlurBetweenCmd.h"
 #include <maya/MFnPlugin.h>
 
 
 MStatus initializePlugin(MObject obj){ 
-	MStatus   status;
+	MStatus stat;
 	MFnPlugin plugin(obj);
 
-	status = plugin.registerCommand("blurTween", BlurBetween::creator, BlurBetween::syntaxCreator);
-	
-	if (!status){
-		status.perror("registerCommand");
-		return status;
+	stat = plugin.registerCommand("blurTween", BlurBetween::creator, BlurBetween::syntaxCreator);
+	if (!stat){
+		stat.perror("registerCommand");
+		return stat;
 	}
 
-	return status;
+
+	stat = plugin.registerCommand("blurTweenUI", BlurTweenUICmd::creator);
+	if (!stat){
+		stat.perror("registerCommand");
+		return stat;
+	}
+
+	return stat;
 }
 
+
 MStatus uninitializePlugin(MObject obj){
-	MStatus   status;
+	MStatus stat;
 	MFnPlugin plugin(obj);
 
-	status = plugin.deregisterCommand("blurTween");
-	
-	if (!status){
-		status.perror("deregisterCommand");
-		return status;
+
+	// get rid of any QT ui's
+    BlurTweenUICmd::cleanup();
+
+
+	stat = plugin.deregisterCommand("blurTween");
+	if (!stat){
+		stat.perror("deregisterCommand");
+		return stat;
 	}
 
-	return status;
+
+	stat = plugin.deregisterCommand("blurTweenUI");
+	if (!stat){
+		stat.perror("deregisterCommand");
+		return stat;
+	}
+
+	return stat;
 }

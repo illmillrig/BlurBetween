@@ -100,7 +100,6 @@ style = r'''
 		}}
 		'''.format( rgb, rgbBright, rgbDark )
 
-print style
 
 pwd = os.path.dirname(__file__)
 uiName = "blurBetween.ui"
