@@ -5,13 +5,14 @@
 #include <QtGui/QSpinBox>
 
 #include "blurBetween_ui.h"
+#include "Tweener.h"
 
 #include <maya/MPxCommand.h>
 #include <maya/MArgList.h>
 
 
 
-// /usr/autodesk/maya2016.5/bin/uic -o BlurBetween/blurBetween_ui.h blurBetween.ui
+
 
 
 //--------------------------------------------------------------------------------
@@ -37,6 +38,7 @@ public slots:
 //--------------------------------------------------------------------------------
 
 class BlurTweenUI : public QWidget, public Ui::BlurTween{
+// /usr/autodesk/maya2016.5/bin/uic -o BlurBetween/blurBetween_ui.h blurBetween.ui
     Q_OBJECT
 public:
     BlurTweenUI( QWidget *parent=0 );
@@ -46,16 +48,23 @@ public:
 public slots:
     void openUndoChunk() const;
     void closeUndoChunk() const;
+    void onClicked(const int &mix);
+    void onSlide(const int &mix);
+    void onRelease(const int &mix);
+    void quickTween(const int &mix, const bool &fresh);
 
 private:
     void createConnections();
     void createCustomWidgets();
-    void getTweenType();
+    void setTweenType();
 
 private:
     QPointer<BlurSpin> uiTweenSPN;
     QPointer<QPushButton> uiTweenBTN;
     short tweenType = 0;
+
+    Tweener bTweener;
+    MAnimCurveChange nullAnimCurveChange;
 };
 
 
