@@ -22,12 +22,12 @@ public:
 	Tweener();
 	~Tweener();
 	
-	MStatus tweenAnimPlugs(double mix, int tweenType, bool fresh, MAnimCurveChange *animCurveChange);
-	MStatus tweenKeyed(double mix, MAnimCurveChange *animCurveChange);
-	MStatus tweenMarked(double mix, MAnimCurveChange *animCurveChange);
-	MStatus tweenManipulator(double mix, MAnimCurveChange *animCurveChange);
-	MStatus tweenCharacter(double mix, MAnimCurveChange *animCurveChange);
-	MStatus tweenGraph(double mix, MAnimCurveChange *animCurveChange);
+	MStatus tweenAnimPlugs(double &mix, const int &tweenType, const bool &fresh, MAnimCurveChange *animCurveChange);
+	MStatus tweenKeyed(double &mix, MAnimCurveChange *animCurveChange);
+	MStatus tweenMarked(double &mix, MAnimCurveChange *animCurveChange);
+	MStatus tweenManipulator(double &mix, MAnimCurveChange *animCurveChange);
+	MStatus tweenCharacter(double &mix, MAnimCurveChange *animCurveChange);
+	MStatus tweenGraph(double &mix, MAnimCurveChange *animCurveChange);
 
 	MObjectArray objArray;
 	MFnAnimCurve fnAnimCurve;
@@ -42,13 +42,13 @@ public:
 	MStatus setCurrentTime();
 	MStatus setDefaults();
 
-	MObject getCharacterNode(MString name);
-	MStatus tweenAttrNames(MStringArray attrs, double mix, MAnimCurveChange *animCurveChange);
+	MObject getCharacterNode(MString &name);
+	MStatus tweenAttrNames(MStringArray &attrs, double &mix, MAnimCurveChange *animCurveChange);
 	MStringArray getAttrsFromManip();
-	MStatus tweenPlug(MObject plug, double mixA, double mixB, MAnimCurveChange *animCurveChange);
-	MStatus collectAndTweenFnCurves(MPlugArray connections, double mixA, double mixB, MAnimCurveChange *animCurveChange);
+	MStatus tweenPlug(MObject &plug, double &mixA, double &mixB, MAnimCurveChange *animCurveChange);
+	MStatus collectAndTweenFnCurves(MPlugArray &connections, double &mixA, double &mixB, MAnimCurveChange *animCurveChange);
 	std::array<double, 2> collectKeyValues(MFnAnimCurve &fnAnimCurve);
-	MStatus tweenStoredPlugs(double mixB);
-	double mixValues(std::array<double, 2> keyValues, double mixA, double mixB);
+	MStatus tweenStoredPlugs(double &mixB);
+	double mixValues(std::array<double, 2> &keyValues, double &mixA, double &mixB);
 
 };

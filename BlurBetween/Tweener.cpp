@@ -31,7 +31,7 @@ MStatus Tweener::setDefaults(){
 }
 
 
-MStatus Tweener::tweenAnimPlugs(double mix, int tweenType, bool fresh, MAnimCurveChange *animCurveChange){
+MStatus Tweener::tweenAnimPlugs(double &mix, const int &tweenType, const bool &fresh, MAnimCurveChange *animCurveChange){
 	
 	if (fresh) {
 	
@@ -63,18 +63,19 @@ MStatus Tweener::tweenAnimPlugs(double mix, int tweenType, bool fresh, MAnimCurv
 }
 
 
-MStatus Tweener::tweenKeyed(double mix, MAnimCurveChange *animCurveChange){
+MStatus Tweener::tweenKeyed(double &mix, MAnimCurveChange *animCurveChange){
 	
 	MPlugArray attrs;
 		
 	MAnimUtil::findAnimatedPlugs(this->nodes, attrs);
-	this->collectAndTweenFnCurves(attrs, (1.0 - mix), mix, animCurveChange);
+	double mixB = 1.0 - mix;
+	this->collectAndTweenFnCurves(attrs, mixB, mix, animCurveChange);
 
 	return MS::kSuccess;
 }
 
 
-MStatus Tweener::tweenMarked(double mix, MAnimCurveChange *animCurveChange){
+MStatus Tweener::tweenMarked(double &mix, MAnimCurveChange *animCurveChange){
 	MStringArray attrNames;
 	MGlobal::executePythonCommand("maya.cmds.channelBox('mainChannelBox', query=True, selectedMainAttributes=True)", attrNames);
 
@@ -85,7 +86,7 @@ MStatus Tweener::tweenMarked(double mix, MAnimCurveChange *animCurveChange){
 }
 
 
-MStatus Tweener::tweenManipulator(double mix, MAnimCurveChange *animCurveChange){
+MStatus Tweener::tweenManipulator(double &mix, MAnimCurveChange *animCurveChange){
 	MStringArray attrNames;
 	attrNames = this->getAttrsFromManip();
 
@@ -96,7 +97,7 @@ MStatus Tweener::tweenManipulator(double mix, MAnimCurveChange *animCurveChange)
 }
 
 
-MStatus Tweener::tweenCharacter(double mix, MAnimCurveChange *animCurveChange){
+MStatus Tweener::tweenCharacter(double &mix, MAnimCurveChange *animCurveChange){
 	MString characterName;
 	MGlobal::executePythonCommand("maya.cmds.selectionConnection('highlightList', query=True, object=True)", characterName);
 
@@ -108,14 +109,15 @@ MStatus Tweener::tweenCharacter(double mix, MAnimCurveChange *animCurveChange){
 		MPlugArray attrs;
 		fnCharacter.getMemberPlugs(attrs);
 
-		this->collectAndTweenFnCurves(attrs, (1.0 - mix), mix, animCurveChange);
+		double mixB = 1.0 - mix;
+		this->collectAndTweenFnCurves(attrs, mixB, mix, animCurveChange);
 	}
 
 	return MS::kSuccess;
 }
 
 
-MStatus Tweener::tweenGraph(double mix, MAnimCurveChange *animCurveChange){
+MStatus Tweener::tweenGraph(double &mix, MAnimCurveChange *animCurveChange){
 	MStringArray attrNames;
 	MGlobal::executePythonCommand("maya.cmds.keyframe(query=True, name=True)", attrNames);
 	
@@ -133,7 +135,7 @@ MStatus Tweener::tweenGraph(double mix, MAnimCurveChange *animCurveChange){
 }
 
 
-MObject Tweener::getCharacterNode(MString name){
+MObject Tweener::getCharacterNode(MString &name){
 	MSelectionList sel;
 	sel.add(name);
 
@@ -144,7 +146,7 @@ MObject Tweener::getCharacterNode(MString name){
 }
 
 
-MStatus Tweener::tweenAttrNames(MStringArray attrNames, double mix, MAnimCurveChange *animCurveChange){
+MStatus Tweener::tweenAttrNames(MStringArray &attrNames, double &mix, MAnimCurveChange *animCurveChange){
 	MDagPath dagNode;
 	double mixA = (1.0 - mix);
 
@@ -163,8 +165,8 @@ MStatus Tweener::tweenAttrNames(MStringArray attrNames, double mix, MAnimCurveCh
 			this->objArray.setLength(0);
 			MAnimUtil::findAnimation(this->fnDepend.findPlug(attrNames[j]), this->objArray);
 
-			for (unsigned int i = 0; j < this->objArray.length(); j++) {
-				this->tweenPlug(this->objArray[j], mixA, mix, animCurveChange);
+			for (unsigned int k = 0; k < this->objArray.length(); k++) {
+				this->tweenPlug(this->objArray[k], mixA, mix, animCurveChange);
 			}
 
 		}
@@ -205,7 +207,7 @@ MStringArray Tweener::getAttrsFromManip(){
 
 
 
-MStatus Tweener::collectAndTweenFnCurves(MPlugArray connections, double mixA, double mixB, MAnimCurveChange *animCurveChange){
+MStatus Tweener::collectAndTweenFnCurves(MPlugArray &connections, double &mixA, double &mixB, MAnimCurveChange *animCurveChange){
 	for (unsigned int i=0; i < connections.length(); i++){
 		
 		this->objArray.setLength(0);
@@ -262,7 +264,7 @@ std::array<double, 2> Tweener::collectKeyValues(MFnAnimCurve &fnAnimCurve){
 }
 
 
-MStatus Tweener::tweenPlug(MObject plug, double mixA, double mixB, MAnimCurveChange *animCurveChange){
+MStatus Tweener::tweenPlug(MObject &plug, double &mixA, double &mixB, MAnimCurveChange *animCurveChange){
 		
 	this->fnAnimCurve.setObject(plug);
 	
@@ -276,7 +278,7 @@ MStatus Tweener::tweenPlug(MObject plug, double mixA, double mixB, MAnimCurveCha
 }
 
 
-MStatus Tweener::tweenStoredPlugs(double mixB){
+MStatus Tweener::tweenStoredPlugs(double &mixB){
 
 	double mixA = (1.0 - mixB);
 	for (size_t i=0; i < this->animPlugs.size(); i++) {
@@ -290,7 +292,7 @@ MStatus Tweener::tweenStoredPlugs(double mixB){
 }
 
 
-double Tweener::mixValues(std::array<double, 2> keyValues, double mixA, double mixB){
+double Tweener::mixValues(std::array<double, 2> &keyValues, double &mixA, double &mixB){
 	return (keyValues[0] * mixA) + (keyValues[1] * mixB);
 }
 

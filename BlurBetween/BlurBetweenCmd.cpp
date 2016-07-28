@@ -32,22 +32,20 @@ BlurBetween::~BlurBetween(){ }
 
 MStatus BlurBetween::doIt(const MArgList &argList ){
 	this->argParser(argList);
-	bTween.tweenAnimPlugs((this->mix/100.0), this->tweenType, this->fresh, &this->animCurveChange);
-
+	double mix = this->mix/100;
+	bTween.tweenAnimPlugs(mix, this->tweenType, this->fresh, &this->animCurveChange);
 	return MS::kSuccess;
 }
 
 
 MStatus BlurBetween::redoIt(){
 	this->animCurveChange.redoIt();
-
 	return MS::kSuccess;
 }
 
 
 MStatus BlurBetween::undoIt(){
 	this->animCurveChange.undoIt();
-	
 	return MS::kSuccess;
 }
 

@@ -47,7 +47,7 @@ void BlurTweenUI::setDefaults() {
     this->setFixedSize(this->sizeHint());
     this->uiTweenSLDR->setRange(-51,151);
     this->setTweenType();
-//    this->setWindowFlags(Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::FramelessWindowHint);
 }
 
 
@@ -173,7 +173,8 @@ void BlurTweenUI::onRelease(const int &mix) {
 
 
 void BlurTweenUI::quickTween(const int &mix, const bool &fresh) {
-    this->bTweener.tweenAnimPlugs((mix / 100.0), this->tweenType, fresh, &this->nullAnimCurveChange);
+    double dmix = mix/100.0;
+    this->bTweener.tweenAnimPlugs(dmix, this->tweenType, fresh, &this->nullAnimCurveChange);
 }
 
 
