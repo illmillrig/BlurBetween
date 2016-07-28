@@ -13,25 +13,22 @@ Tweener::Tweener(){}
 Tweener::~Tweener(){}
 
 
-MStatus Tweener::setCurrentTime(){
+void Tweener::setCurrentTime(){
 	this->currentTime = MAnimControl::currentTime();
-	return MS::kSuccess;
 }
 
 
-MStatus Tweener::setDefaults(){
+void Tweener::setDefaults(){
 	this->animPlugs.clear();
 	this->animValues.clear();
 	
 	MGlobal::getActiveSelectionList(this->nodes);
 	
 	setCurrentTime();
-
-	return MS::kSuccess;
 }
 
 
-MStatus Tweener::tweenAnimPlugs(double &mix, const int &tweenType, const bool &fresh, MAnimCurveChange *animCurveChange){
+void Tweener::tweenAnimPlugs(const double &mix, const int &tweenType, const bool &fresh, MAnimCurveChange *animCurveChange){
 	
 	if (fresh) {
 	
@@ -59,49 +56,41 @@ MStatus Tweener::tweenAnimPlugs(double &mix, const int &tweenType, const bool &f
 	else
 		tweenStoredPlugs(mix);
 
-	return MS::kSuccess;
 }
 
 
-MStatus Tweener::tweenKeyed(double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenKeyed(const double &mix, MAnimCurveChange *animCurveChange){
 	
 	MPlugArray attrs;
 		
 	MAnimUtil::findAnimatedPlugs(this->nodes, attrs);
-	double mixB = 1.0 - mix;
-	this->collectAndTweenFnCurves(attrs, mixB, mix, animCurveChange);
-
-	return MS::kSuccess;
+	this->collectAndTweenFnCurves(attrs, (1.0 - mix), mix, animCurveChange);
 }
 
 
-MStatus Tweener::tweenMarked(double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenMarked(const double &mix, MAnimCurveChange *animCurveChange){
 	MStringArray attrNames;
 	MGlobal::executeCommand("channelBox -query -selectedMainAttributes mainChannelBox;", attrNames);
 
-	if (attrNames.length() > 0)
+	if (attrNames.length())
 		this->tweenAttrNames(attrNames, mix, animCurveChange);
-	
-	return MS::kSuccess;
 }
 
 
-MStatus Tweener::tweenManipulator(double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenManipulator(const double &mix, MAnimCurveChange *animCurveChange){
 	MStringArray attrNames;
 	attrNames = this->getAttrsFromManip();
 
-	if (attrNames.length() > 0)
+	if (attrNames.length())
 		tweenAttrNames(attrNames, mix, animCurveChange);
-	
-	return MS::kSuccess;
 }
 
 
-MStatus Tweener::tweenCharacter(double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenCharacter(const double &mix, MAnimCurveChange *animCurveChange){
 	MString characterName;
 	MGlobal::executeCommand("selectionConnection -query -object highlightList;", characterName);
 
-	if (characterName.length() > 0){
+	if (characterName.length()){
 		MObject character;
 		this->getCharacterNode(characterName);
 
@@ -109,33 +98,28 @@ MStatus Tweener::tweenCharacter(double &mix, MAnimCurveChange *animCurveChange){
 		MPlugArray attrs;
 		fnCharacter.getMemberPlugs(attrs);
 
-		double mixB = 1.0 - mix;
-		this->collectAndTweenFnCurves(attrs, mixB, mix, animCurveChange);
+		this->collectAndTweenFnCurves(attrs, (1.0 - mix), mix, animCurveChange);
 	}
-
-	return MS::kSuccess;
 }
 
 
-MStatus Tweener::tweenGraph(double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenGraph(const double &mix, MAnimCurveChange *animCurveChange){
 	MStringArray attrNames;
 	MGlobal::executeCommand("keyframe -query -name", attrNames);
 	
 	MSelectionList sel;
 	MObject animCurve;
-	double mixA = (1.0 - mix);
+	unsigned int length = attrNames.length();
 	
-	for (unsigned int i=0; i < attrNames.length(); i++){
+	for (unsigned int i=0; i < length; i++){
 		sel.add(attrNames[i]);
 		sel.getDependNode(i, animCurve);
-		this->tweenPlug(animCurve, mixA, mix, animCurveChange);
+		this->tweenPlug(animCurve, (1.0 - mix), mix, animCurveChange);
 	}
-
-	return MS::kSuccess;
 }
 
 
-MObject Tweener::getCharacterNode(MString &name){
+MObject Tweener::getCharacterNode(const MString &name){
 	MSelectionList sel;
 	sel.add(name);
 
@@ -146,33 +130,37 @@ MObject Tweener::getCharacterNode(MString &name){
 }
 
 
-MStatus Tweener::tweenAttrNames(MStringArray &attrNames, double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenAttrNames(const MStringArray &attrNames, const double mix, MAnimCurveChange *animCurveChange){
 	MDagPath dagNode;
-	double mixA = (1.0 - mix);
 
-	for (unsigned int i=0; i < this->nodes.length(); i++){
+	unsigned int length1 = this->nodes.length();
+	unsigned int length2 = 0;
+	unsigned int length3 = 0;
+
+	for (unsigned int i=0; i < length1; i++){
 
 		this->nodes.getDagPath(i, dagNode);
 
-		if (!MAnimUtil::isAnimated(dagNode)){
-			return MS::kSuccess;
-		}
+		if (!MAnimUtil::isAnimated(dagNode))
+			return;
 		
 		this->fnDepend.setObject(dagNode.node());
-		for (unsigned int j=0; j < attrNames.length(); j++){
 
+		length2 = attrNames.length();
+		for (unsigned int j=0; j < length2; j++){
+
+			// TODO: This seems like duplicate code
 
 			this->objArray.setLength(0);
 			MAnimUtil::findAnimation(this->fnDepend.findPlug(attrNames[j]), this->objArray);
 
-			for (unsigned int k = 0; k < this->objArray.length(); k++) {
-				this->tweenPlug(this->objArray[k], mixA, mix, animCurveChange);
+			length3 = this->objArray.length();
+			for (unsigned int k = 0; k < length3; k++) {
+				this->tweenPlug(this->objArray[k], (1.0 - mix), mix, animCurveChange);
 			}
 
 		}
 	}
-
-	return MS::kSuccess;
 }
 
 
@@ -181,7 +169,7 @@ MStringArray Tweener::getAttrsFromManip(){
 	MGlobal::executeCommand("currentCtx;", ctx);
 	MStringArray attrNames;
 
-	if (ctx.length() == 0)
+	if (!ctx.length())
 		return attrNames;
 
 	else if (ctx == "moveSuperContext") {
@@ -206,19 +194,23 @@ MStringArray Tweener::getAttrsFromManip(){
 }
 
 
+void Tweener::collectAndTweenFnCurves(const MPlugArray &connections, const double &mixA, const double &mixB,
+									  MAnimCurveChange *animCurveChange){
 
-MStatus Tweener::collectAndTweenFnCurves(MPlugArray &connections, double &mixA, double &mixB, MAnimCurveChange *animCurveChange){
-	for (unsigned int i=0; i < connections.length(); i++){
-		
-		this->objArray.setLength(0);
+	unsigned int length1 = connections.length();
+	unsigned int length2 = 0;
+
+	for (unsigned int i=0; i < length1; i++){
+
+		// TODO: This seems like duplicate code
+
+		this->objArray.setLength(0); // is this needed? or does findAnimation() clear it for you?
 		MAnimUtil::findAnimation(connections[i], this->objArray);
 
-		for (unsigned int i=0; i < this->objArray.length(); i++)
-			this->tweenPlug(this->objArray[i], mixA, mixB, animCurveChange);
-
+		length2 = this->objArray.length();
+		for (unsigned int j=0; j < length2; j++)
+			this->tweenPlug(this->objArray[j], mixA, mixB, animCurveChange);
 	}
-
-	return MS::kSuccess;
 }
 
 
@@ -264,35 +256,31 @@ std::array<double, 2> Tweener::collectKeyValues(MFnAnimCurve &fnAnimCurve){
 }
 
 
-MStatus Tweener::tweenPlug(MObject &plug, double &mixA, double &mixB, MAnimCurveChange *animCurveChange){
-		
+void Tweener::tweenPlug(const MObject &plug, const double mixA, const double mixB, MAnimCurveChange *animCurveChange){
+
 	this->fnAnimCurve.setObject(plug);
 	
 	this->animPlugs.push_back(plug);
 	this->animValues.push_back(this->collectKeyValues(fnAnimCurve));
 
 	this->fnAnimCurve.addKey(this->currentTime, this->mixValues(this->animValues.back(), mixA, mixB),
-								MFnAnimCurve::kTangentAuto, MFnAnimCurve::kTangentAuto, animCurveChange);
-	
-	return MS::kSuccess;
+							 MFnAnimCurve::kTangentAuto, MFnAnimCurve::kTangentAuto, animCurveChange);
 }
 
 
-MStatus Tweener::tweenStoredPlugs(double &mixB){
+void Tweener::tweenStoredPlugs(const double mixB){
 
-	double mixA = (1.0 - mixB);
-	for (size_t i=0; i < this->animPlugs.size(); i++) {
+	size_t numPlugs = this->animPlugs.size();
+	for (size_t i=0; i < numPlugs; i++) {
 		
 		this->fnAnimCurve.setObject(this->animPlugs[i]);
-		this->fnAnimCurve.addKey(this->currentTime, this->mixValues(this->animValues[i], mixA, mixB),
-									MFnAnimCurve::kTangentAuto, MFnAnimCurve::kTangentAuto);
+		this->fnAnimCurve.addKey(this->currentTime, this->mixValues(this->animValues[i], (1.0 - mixB), mixB),
+  								 MFnAnimCurve::kTangentAuto, MFnAnimCurve::kTangentAuto, nullptr);
 	}
-
-	return MS::kSuccess;
 }
 
 
-double Tweener::mixValues(std::array<double, 2> &keyValues, double &mixA, double &mixB){
+inline double Tweener::mixValues(const std::array<double, 2> &keyValues, const double &mixA, const double &mixB) const {
 	return (keyValues[0] * mixA) + (keyValues[1] * mixB);
 }
 

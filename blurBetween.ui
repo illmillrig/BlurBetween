@@ -544,6 +544,9 @@ QGroupBox{
              <pointsize>8</pointsize>
             </font>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
            <property name="autoFillBackground">
             <bool>false</bool>
            </property>
@@ -574,6 +577,9 @@ QGroupBox{
              <pointsize>8</pointsize>
             </font>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
            <property name="autoFillBackground">
             <bool>false</bool>
            </property>
@@ -600,6 +606,9 @@ QGroupBox{
             <font>
              <pointsize>8</pointsize>
             </font>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
            </property>
            <property name="autoFillBackground">
             <bool>false</bool>
@@ -628,6 +637,9 @@ QGroupBox{
              <pointsize>8</pointsize>
             </font>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
            <property name="autoFillBackground">
             <bool>false</bool>
            </property>
@@ -654,6 +666,9 @@ QGroupBox{
             <font>
              <pointsize>8</pointsize>
             </font>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
            </property>
            <property name="autoFillBackground">
             <bool>false</bool>

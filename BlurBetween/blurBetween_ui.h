@@ -317,6 +317,7 @@ public:
         QFont font1;
         font1.setPointSize(8);
         uiKeyedCHK->setFont(font1);
+        uiKeyedCHK->setFocusPolicy(Qt::StrongFocus);
         uiKeyedCHK->setAutoFillBackground(false);
         uiKeyedCHK->setChecked(true);
         uiKeyedCHK->setAutoExclusive(true);
@@ -329,6 +330,7 @@ public:
         sizePolicy3.setHeightForWidth(uiMarkedCHK->sizePolicy().hasHeightForWidth());
         uiMarkedCHK->setSizePolicy(sizePolicy3);
         uiMarkedCHK->setFont(font1);
+        uiMarkedCHK->setFocusPolicy(Qt::StrongFocus);
         uiMarkedCHK->setAutoFillBackground(false);
         uiMarkedCHK->setAutoExclusive(true);
 
@@ -340,6 +342,7 @@ public:
         sizePolicy3.setHeightForWidth(uiManipulatorCHK->sizePolicy().hasHeightForWidth());
         uiManipulatorCHK->setSizePolicy(sizePolicy3);
         uiManipulatorCHK->setFont(font1);
+        uiManipulatorCHK->setFocusPolicy(Qt::StrongFocus);
         uiManipulatorCHK->setAutoFillBackground(false);
         uiManipulatorCHK->setAutoExclusive(true);
 
@@ -351,6 +354,7 @@ public:
         sizePolicy3.setHeightForWidth(uiCharacterCHK->sizePolicy().hasHeightForWidth());
         uiCharacterCHK->setSizePolicy(sizePolicy3);
         uiCharacterCHK->setFont(font1);
+        uiCharacterCHK->setFocusPolicy(Qt::StrongFocus);
         uiCharacterCHK->setAutoFillBackground(false);
         uiCharacterCHK->setAutoExclusive(true);
 
@@ -362,6 +366,7 @@ public:
         sizePolicy3.setHeightForWidth(uiGraphCHK->sizePolicy().hasHeightForWidth());
         uiGraphCHK->setSizePolicy(sizePolicy3);
         uiGraphCHK->setFont(font1);
+        uiGraphCHK->setFocusPolicy(Qt::StrongFocus);
         uiGraphCHK->setAutoFillBackground(false);
         uiGraphCHK->setAutoExclusive(true);
 
@@ -373,6 +378,22 @@ public:
 
         gridLayout->addWidget(uiBreakdownGRP, 0, 0, 1, 1);
 
+        QWidget::setTabOrder(uiKeyedCHK, uiMarkedCHK);
+        QWidget::setTabOrder(uiMarkedCHK, uiManipulatorCHK);
+        QWidget::setTabOrder(uiManipulatorCHK, uiCharacterCHK);
+        QWidget::setTabOrder(uiCharacterCHK, uiGraphCHK);
+        QWidget::setTabOrder(uiGraphCHK, uiTweenSLDR);
+        QWidget::setTabOrder(uiTweenSLDR, uiSeek0BTN_2);
+        QWidget::setTabOrder(uiSeek0BTN_2, uiSeek25BTN_3);
+        QWidget::setTabOrder(uiSeek25BTN_3, uiSeek25BTN);
+        QWidget::setTabOrder(uiSeek25BTN, uiSeek25BTN_2);
+        QWidget::setTabOrder(uiSeek25BTN_2, uiSeek50BTN);
+        QWidget::setTabOrder(uiSeek50BTN, uiSeek75BTN_2);
+        QWidget::setTabOrder(uiSeek75BTN_2, uiSeek75BTN);
+        QWidget::setTabOrder(uiSeek75BTN, uiSeek75BTN_3);
+        QWidget::setTabOrder(uiSeek75BTN_3, uiSeek75BTN_4);
+        QWidget::setTabOrder(uiSeek75BTN_4, uiSeek75BTN_5);
+        QWidget::setTabOrder(uiSeek75BTN_5, uiSeek100BTN);
 
         retranslateUi(BlurTween);
 

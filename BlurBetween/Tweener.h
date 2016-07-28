@@ -22,33 +22,33 @@ public:
 	Tweener();
 	~Tweener();
 	
-	MStatus tweenAnimPlugs(double &mix, const int &tweenType, const bool &fresh, MAnimCurveChange *animCurveChange);
-	MStatus tweenKeyed(double &mix, MAnimCurveChange *animCurveChange);
-	MStatus tweenMarked(double &mix, MAnimCurveChange *animCurveChange);
-	MStatus tweenManipulator(double &mix, MAnimCurveChange *animCurveChange);
-	MStatus tweenCharacter(double &mix, MAnimCurveChange *animCurveChange);
-	MStatus tweenGraph(double &mix, MAnimCurveChange *animCurveChange);
+	void tweenAnimPlugs(const double &mix, const int &tweenType, const bool &fresh, MAnimCurveChange *animCurveChange);
+	void tweenKeyed(const double &mix, MAnimCurveChange *animCurveChange);
+	void tweenMarked(const double &mix, MAnimCurveChange *animCurveChange);
+	void tweenManipulator(const double &mix, MAnimCurveChange *animCurveChange);
+	void tweenCharacter(const double &mix, MAnimCurveChange *animCurveChange);
+	void tweenGraph(const double &mix, MAnimCurveChange *animCurveChange);
 
+private:
 	MObjectArray objArray;
 	MFnAnimCurve fnAnimCurve;
 	MFnDependencyNode fnDepend;
 	MSelectionList nodes;
 	MTime currentTime;
 	MAnimCurveChange animCurveChange;
-
 	std::vector <MObject> animPlugs;
 	std::vector <std::array<double, 2> > animValues;
-		
-	MStatus setCurrentTime();
-	MStatus setDefaults();
 
-	MObject getCharacterNode(MString &name);
-	MStatus tweenAttrNames(MStringArray &attrs, double &mix, MAnimCurveChange *animCurveChange);
+private:
+	void setCurrentTime();
+	void setDefaults();
+	MObject getCharacterNode(const MString &name);
+	void tweenAttrNames(const MStringArray &attrs, const double mix, MAnimCurveChange *animCurveChange);
 	MStringArray getAttrsFromManip();
-	MStatus tweenPlug(MObject &plug, double &mixA, double &mixB, MAnimCurveChange *animCurveChange);
-	MStatus collectAndTweenFnCurves(MPlugArray &connections, double &mixA, double &mixB, MAnimCurveChange *animCurveChange);
+	void tweenPlug(const MObject &plug, const double mixA, const double mixB, MAnimCurveChange *animCurveChange);
+	void collectAndTweenFnCurves(const MPlugArray &connections, const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange);
 	std::array<double, 2> collectKeyValues(MFnAnimCurve &fnAnimCurve);
-	MStatus tweenStoredPlugs(double &mixB);
-	double mixValues(std::array<double, 2> &keyValues, double &mixA, double &mixB);
+	void tweenStoredPlugs(const double mixB);
+	double mixValues(const std::array<double, 2> &keyValues, const double &mixA, const double &mixB) const;
 
 };
