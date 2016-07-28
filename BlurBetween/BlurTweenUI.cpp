@@ -47,7 +47,7 @@ void BlurTweenUI::setDefaults() {
     this->setFixedSize(this->sizeHint());
     this->uiTweenSLDR->setRange(-51,151);
     this->setTweenType();
-    this->setWindowFlags(Qt::FramelessWindowHint);
+//    this->setWindowFlags(Qt::FramelessWindowHint);
 }
 
 
@@ -66,7 +66,6 @@ void BlurTweenUI::createConnections() {
     // Spin
     this->connect(this->uiTweenSPN, SIGNAL( stepped(int) ), SLOT( setSliderValue() ));
     this->connect(this->uiTweenSPN, SIGNAL( stepped(int) ), SLOT( onClicked() ));
-
     this->connect(this->uiTweenSPN, SIGNAL( editingFinished() ), SLOT( onClicked() ));
     this->connect(this->uiTweenSPN, SIGNAL( editingFinished() ), SLOT( setSliderValue() ));
 
@@ -141,13 +140,12 @@ void BlurTweenUI::onSeek() {
 
 
 void BlurTweenUI::tweenAll(const int &mix, const bool &fresh) {
-    // UI tweening type
     this->setTweenType();
 
     // full tween once so we can undo to before this
     this->fullTween(mix, true);
 
-    // quick tween once to set tween class data for use while sliding
+    // quick tween once to set tween class data for use while sliding - much faster
     this->quickTween(mix, true);
 }
 
