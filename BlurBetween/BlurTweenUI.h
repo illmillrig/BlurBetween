@@ -48,15 +48,28 @@ public:
 public slots:
     void openUndoChunk() const;
     void closeUndoChunk() const;
+    void onClicked();
     void onClicked(const int &mix);
+    void onSliderClicked();
+    void onSeek();
+    void onSlide();
     void onSlide(const int &mix);
+    void onRelease();
     void onRelease(const int &mix);
     void quickTween(const int &mix, const bool &fresh);
+    void fullTween(const int &mix, const bool &fresh);
+    void setSliderValue();
+    void setSliderValue(const int &mix);
+    void setSpinValue();
+    void setSpinValue(const int &mix);
+    void setSliderValueFromSeek();
+    void setSpinValueFromSeek();
 
 private:
     void createConnections();
     void createCustomWidgets();
     void setTweenType();
+    void tweenAll(const int &mix, const bool &fresh);
 
 private:
     QPointer<BlurSpin> uiTweenSPN;

@@ -674,6 +674,25 @@ QGroupBox{
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>uiKeyedCHK</tabstop>
+  <tabstop>uiMarkedCHK</tabstop>
+  <tabstop>uiManipulatorCHK</tabstop>
+  <tabstop>uiCharacterCHK</tabstop>
+  <tabstop>uiGraphCHK</tabstop>
+  <tabstop>uiTweenSLDR</tabstop>
+  <tabstop>uiSeek0BTN_2</tabstop>
+  <tabstop>uiSeek25BTN_3</tabstop>
+  <tabstop>uiSeek25BTN</tabstop>
+  <tabstop>uiSeek25BTN_2</tabstop>
+  <tabstop>uiSeek50BTN</tabstop>
+  <tabstop>uiSeek75BTN_2</tabstop>
+  <tabstop>uiSeek75BTN</tabstop>
+  <tabstop>uiSeek75BTN_3</tabstop>
+  <tabstop>uiSeek75BTN_4</tabstop>
+  <tabstop>uiSeek75BTN_5</tabstop>
+  <tabstop>uiSeek100BTN</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
