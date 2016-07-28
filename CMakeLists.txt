@@ -14,10 +14,7 @@ set(SOURCE_FILES
         BlurBetween/BlurTweenUI.h
         BlurBetween/BlurTweenUI.cpp
         BlurBetween/pluginMain.cpp
-
         blurBetween.ui
-        blurBetweenUI.py
-
         BlurBetween/blurBetween_ui.h
         )
 

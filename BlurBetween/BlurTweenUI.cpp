@@ -129,11 +129,6 @@ void BlurTweenUI::onClicked() {
 }
 
 
-void BlurTweenUI::onClicked(const int &mix) {
-    this->fullTween(mix, true);
-}
-
-
 void BlurTweenUI::onSliderClicked() {
     this->tweenAll(this->uiTweenSLDR->value(), true);
 }

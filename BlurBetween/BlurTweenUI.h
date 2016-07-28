@@ -49,7 +49,6 @@ public slots:
     void openUndoChunk() const;
     void closeUndoChunk() const;
     void onClicked();
-    void onClicked(const int &mix);
     void onSliderClicked();
     void onSeek();
     void onSlide();
