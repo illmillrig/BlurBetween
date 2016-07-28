@@ -77,7 +77,7 @@ MStatus Tweener::tweenKeyed(double &mix, MAnimCurveChange *animCurveChange){
 
 MStatus Tweener::tweenMarked(double &mix, MAnimCurveChange *animCurveChange){
 	MStringArray attrNames;
-	MGlobal::executePythonCommand("maya.cmds.channelBox('mainChannelBox', query=True, selectedMainAttributes=True)", attrNames);
+	MGlobal::executeCommand("channelBox -query -selectedMainAttributes mainChannelBox;", attrNames);
 
 	if (attrNames.length() > 0)
 		this->tweenAttrNames(attrNames, mix, animCurveChange);
@@ -99,7 +99,7 @@ MStatus Tweener::tweenManipulator(double &mix, MAnimCurveChange *animCurveChange
 
 MStatus Tweener::tweenCharacter(double &mix, MAnimCurveChange *animCurveChange){
 	MString characterName;
-	MGlobal::executePythonCommand("maya.cmds.selectionConnection('highlightList', query=True, object=True)", characterName);
+	MGlobal::executeCommand("selectionConnection -query -object highlightList;", characterName);
 
 	if (characterName.length() > 0){
 		MObject character;
@@ -119,7 +119,7 @@ MStatus Tweener::tweenCharacter(double &mix, MAnimCurveChange *animCurveChange){
 
 MStatus Tweener::tweenGraph(double &mix, MAnimCurveChange *animCurveChange){
 	MStringArray attrNames;
-	MGlobal::executePythonCommand("maya.cmds.keyframe(query=True, name=True)", attrNames);
+	MGlobal::executeCommand("keyframe -query -name", attrNames);
 	
 	MSelectionList sel;
 	MObject animCurve;
@@ -178,7 +178,7 @@ MStatus Tweener::tweenAttrNames(MStringArray &attrNames, double &mix, MAnimCurve
 
 MStringArray Tweener::getAttrsFromManip(){
 	MString ctx;
-	MGlobal::executePythonCommand("maya.cmds.currentCtx()", ctx);
+	MGlobal::executeCommand("currentCtx;", ctx);
 	MStringArray attrNames;
 
 	if (ctx.length() == 0)
