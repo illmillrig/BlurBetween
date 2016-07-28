@@ -47,7 +47,7 @@ void BlurTweenUI::setDefaults() {
     this->setFixedSize(this->sizeHint());
     this->uiTweenSLDR->setRange(-51,151);
     this->setTweenType();
-//    this->setWindowFlags(Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::FramelessWindowHint);
 }
 
 
@@ -135,7 +135,6 @@ void BlurTweenUI::onSliderClicked() {
 
 
 void BlurTweenUI::onSeek() {
-    // TODO: Bulletproof this. but for now we'll assume that the only QObject connected to this slot is a seekBtn with a mixValue property
     int seekValue = sender()->property("mixValue").toInt();
     this->tweenAll(seekValue, true);
 }
@@ -224,14 +223,12 @@ void BlurTweenUI::setSpinValue(const int &mix) {
 
 
 void BlurTweenUI::setSliderValueFromSeek() {
-    // TODO: Bulletproof this. but for now we'll assume that the only QObject connected to this slot is a seekBtn with a mixValue property
     int seekValue = sender()->property("mixValue").toInt();
     this->uiTweenSLDR->setValue(seekValue);
 }
 
 
 void BlurTweenUI::setSpinValueFromSeek() {
-    // TODO: Bulletproof this. but for now we'll assume that the only QObject connected to this slot is a seekBtn with a mixValue property
     int seekValue = sender()->property("mixValue").toInt();
     this->uiTweenSPN->setValue(seekValue);
 }
@@ -282,7 +279,6 @@ void* BlurTweenUICmd::creator() {
 
 void BlurTweenUICmd::cleanup(){
     if (blurTweenWindow != nullptr)
-        blurTweenWindow->close();
         delete blurTweenWindow;
 }
 
