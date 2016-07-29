@@ -17,7 +17,7 @@
    <string notr="true">
 
 QPushButton{
-	background-color: rgb(89, 147, 126);
+	background-color: rgb(89, 113, 147);
 	border-style: solid;
 	border-width:0px;
 	border-color: rgb(60, 60, 60);
@@ -27,22 +27,22 @@ QPushButton{
 }
 
 QPushButton:pressed{
-	background-color: rgb(119, 197, 169);
+	background-color: rgb(107, 136, 177);
 }
 
 
 QSlider:groove{
-	background-color: rgb(89, 147, 126);
+	background-color: rgb(89, 113, 147);
 	border-radius:5px;
 }
 
 QSlider:handle:horizontal{
 	width: 3px;
-	background-color: rgb(119, 197, 169);
+	background-color: rgb(107, 136, 177);
 }
 
 QSlider:sub-page:horizontal{		
-	background-color: rgb(89, 147, 126);
+	background-color: rgb(89, 113, 147);
 	border-top-left-radius:5px;
 	border-bottom-left-radius:5px;
 }
@@ -51,11 +51,10 @@ QSlider:sub-page:horizontal{
 QSlider:add-page:horizontal{		
 	border-top-right-radius:5px;
 	border-bottom-right-radius:5px;
-	background-color: rgb(70, 117, 100);
+	background-color: rgb(70, 90, 117);
 }
 
-QSpinBox{
-	
+QSpinBox{	
 	color: rgb(50, 50, 50);
 	background-color: rgb(165, 165, 165);
 }
