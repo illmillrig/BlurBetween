@@ -3,10 +3,13 @@
 #include "BlurBetweenCmd.h"
 
 #include <QtGui/QPushButton>
+#include <QtGui/QMainWindow>
 #include <QtCore/QList>
 
 #include <maya/MGlobal.h>
+#include <maya/MQtUtil.h>
 #include <maya/MAnimCurveChange.h>
+#include <maya/MEventMessage.h>
 
 
 //--------------------------------------------------------------------------------
@@ -22,6 +25,22 @@ void BlurSpin::stepBy(int steps) {
 
 
 //--------------------------------------------------------------------------------
+// EVENT FILTERS
+//--------------------------------------------------------------------------------
+
+
+ViewRefreshFilter::ViewRefreshFilter() { }
+
+bool ViewRefreshFilter::eventFilter(QObject *obj, QEvent *event){
+
+    if (event->type() == QEvent::Resize)
+        BlurTweenUICmd::blurTweenWindow->moveToPosition();
+
+    return false;
+}
+
+
+//--------------------------------------------------------------------------------
 // BLURTWEEN UI
 //--------------------------------------------------------------------------------
 
@@ -30,6 +49,7 @@ BlurTweenUI::BlurTweenUI(QWidget *parent) : QWidget(parent) {
     this->createCustomWidgets();
     this->createConnections();
     this->setDefaults();
+    this->moveToPosition();
     this->show();
 }
 
@@ -40,14 +60,43 @@ BlurTweenUI::~BlurTweenUI() {
 
     if (this->uiTweenSPN != nullptr)
         delete this->uiTweenSPN;
+
+    this->destroyEventFilters();
+
+    if (this->freshFilter != nullptr)
+        delete this->freshFilter;
 }
 
 
 void BlurTweenUI::setDefaults() {
     this->setFixedSize(this->sizeHint());
-    this->uiTweenSLDR->setRange(-51,151);
-    this->setTweenType();
     this->setWindowFlags(Qt::FramelessWindowHint);
+
+    // TODO: Test setting this to false on Windows for a transparent background
+    this->setAutoFillBackground(true);
+
+    this->setTweenType();
+    this->uiTweenSLDR->setRange(-25,125);
+    this->uiTweenSPN->setRange(-25,125);
+
+    this->freshFilter = new ViewRefreshFilter;
+    this->createEventFilters();
+}
+
+
+void BlurTweenUI::createEventFilters() {
+    QWidget *mayaWindow = MQtUtil::mainWindow();
+    QWidget *viewPanes = mayaWindow->findChild <QWidget*> ("viewPanes");
+
+    viewPanes->installEventFilter(this->freshFilter);
+}
+
+
+void BlurTweenUI::destroyEventFilters() {
+    QWidget *mayaWindow = MQtUtil::mainWindow();
+    QWidget *viewPanes = mayaWindow->findChild <QWidget*> ("viewPanes");
+
+    viewPanes->removeEventFilter(this->freshFilter);
 }
 
 
@@ -115,12 +164,8 @@ void BlurTweenUI::closeUndoChunk() const {
 
 // This seems strange I know, but the logic is this:
 // we need to make calls through the commands layer with MGlobal::executeCommand("blurTween") so that tweens get added to the undo que. But we don't
-// really always need undos.  like while we're sliding.  However, In order for the tweener class to tween with existing information and be
-// fast (refresh=false), we would need to have already tweened with it set (refresh=true).  That's why when the slider is pressed,
-// we quickTween and fullTween. fullTween so we can undo back to before this, and quickTween so that while after clicking, while we're
-// sliding, we can just tween only with no undo information and bypass calls through the commands layer.  when we release, we fullTween
-// once more to get undo's added to the que.
-// Also, no having lambda expressions for signal slot connections in 4.8 requires a few more convenience functions for passing around values
+// really always need undos.  like while we're sliding.  so we keep a ptr to the static tweener class of the BlurBetween MpxCommand
+// in order for the tweener class to tween with existing information and be fast while sliding.
 
 
 void BlurTweenUI::onClicked() {
@@ -129,24 +174,13 @@ void BlurTweenUI::onClicked() {
 
 
 void BlurTweenUI::onSliderClicked() {
-    this->tweenAll(this->uiTweenSLDR->value(), true);
+    this->fullTween(this->uiTweenSLDR->value(), true);
 }
 
 
 void BlurTweenUI::onSeek() {
     int seekValue = sender()->property("mixValue").toInt();
-    this->tweenAll(seekValue, true);
-}
-
-
-void BlurTweenUI::tweenAll(const int &mix, const bool &fresh) {
-    this->setTweenType();
-
-    // full tween once so we can undo to before this
-    this->fullTween(mix, true);
-
-    // quick tween once to set tween class data for use while sliding - much faster
-    this->quickTween(mix, true);
+    this->fullTween(seekValue, true);
 }
 
 
@@ -173,12 +207,13 @@ void BlurTweenUI::onRelease(const int &mix) {
 
 
 void BlurTweenUI::quickTween(const int &mix, const bool &fresh) {
-    double dmix = mix/100.0;
-    this->bTweener.tweenAnimPlugs(dmix, this->tweenType, fresh, &this->nullAnimCurveChange);
+    BlurBetween::bTween.tweenAnimPlugs(mix/100.0, this->tweenType, fresh, &this->nullAnimCurveChange);
 }
 
 
 void BlurTweenUI::fullTween(const int &mix, const bool &fresh) {
+
+   this->setTweenType();
 
     // TODO: This could probably be cleaned up/optimized a bit.
 
@@ -265,6 +300,24 @@ void BlurTweenUI::setTweenType() {
 }
 
 
+void BlurTweenUI::moveToPosition() {
+    QWidget *mayaWindow = MQtUtil::mainWindow();
+    QWidget *viewPanes = mayaWindow->findChild <QWidget*> ("viewPanes");
+
+    QRect viewRect = viewPanes->rect();
+
+    QPoint topLeft = viewPanes->mapTo(mayaWindow, viewRect.topLeft());
+    QPoint topRight = viewPanes->mapTo(mayaWindow, viewRect.topRight());
+    QPoint center = (topLeft + topRight) / 2;
+
+    center.setY(center.y() + (this->height()/2) + 10);
+    center.setX(center.x() - (this->width()/2));
+
+    this->move(center);
+    this->raise();
+}
+
+
 //--------------------------------------------------------------------------------
 // BLURTWEEN UI COMMAND
 //--------------------------------------------------------------------------------
@@ -283,9 +336,8 @@ void BlurTweenUICmd::cleanup(){
 
 
 MStatus BlurTweenUICmd::doIt(const MArgList &args ){
-
     if (blurTweenWindow == nullptr)
-        blurTweenWindow = new BlurTweenUI();
+        blurTweenWindow = new BlurTweenUI(MQtUtil::mainWindow());
 
     else {
         blurTweenWindow->showNormal();

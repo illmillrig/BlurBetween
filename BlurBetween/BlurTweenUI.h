@@ -9,6 +9,7 @@
 
 #include <maya/MPxCommand.h>
 #include <maya/MArgList.h>
+#include <maya/MMessage.h>
 
 
 //--------------------------------------------------------------------------------
@@ -28,6 +29,17 @@ public slots:
 };
 
 
+//--------------------------------------------------------------------------------
+// EVENT FILTERS
+//--------------------------------------------------------------------------------
+
+class ViewRefreshFilter : public QObject {
+    Q_OBJECT
+public:
+    ViewRefreshFilter();
+    virtual bool eventFilter(QObject *obj, QEvent *event);
+};
+
 
 //--------------------------------------------------------------------------------
 // BLURTWEEN UI
@@ -40,6 +52,7 @@ public:
     BlurTweenUI( QWidget *parent=0 );
     virtual ~BlurTweenUI();
     virtual void setDefaults();
+    void moveToPosition();
 
 public slots:
     void openUndoChunk() const;
@@ -60,18 +73,20 @@ public slots:
     void setSliderValueFromSeek();
     void setSpinValueFromSeek();
 
+
 private:
     void createConnections();
+    void createEventFilters();
+    void destroyEventFilters();
     void createCustomWidgets();
     void setTweenType();
-    void tweenAll(const int &mix, const bool &fresh);
+    MCallbackId callbackID;
+    ViewRefreshFilter *freshFilter;
 
 private:
     QPointer<BlurSpin> uiTweenSPN;
     QPointer<QPushButton> uiTweenBTN;
     short tweenType = 0;
-
-    Tweener bTweener;
     MAnimCurveChange nullAnimCurveChange;
 };
 

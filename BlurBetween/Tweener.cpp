@@ -28,65 +28,67 @@ void Tweener::setDefaults(){
 }
 
 
-void Tweener::tweenAnimPlugs(const double &mix, const int &tweenType, const bool &fresh, MAnimCurveChange *animCurveChange){
-	
+void Tweener::tweenAnimPlugs(const double mix, const int &tweenType, const bool &fresh, MAnimCurveChange *animCurveChange){
+
+	const double mixA = 1.0 - mix;
+
 	if (fresh) {
 	
 		this->setDefaults();
 
 		if (tweenType == 0)
-			this->tweenKeyed(mix, animCurveChange);
+			this->tweenKeyed(mixA, mix, animCurveChange);
 		
 		else if (tweenType == 1)
-			this->tweenMarked(mix, animCurveChange);
+			this->tweenMarked(mixA, mix, animCurveChange);
 
 		else if (tweenType == 2)
-			this->tweenManipulator(mix, animCurveChange);
+			this->tweenManipulator(mixA, mix, animCurveChange);
 
 		else if (tweenType == 3)
-			this->tweenCharacter(mix, animCurveChange);
+			this->tweenCharacter(mixA, mix, animCurveChange);
 
 		else if (tweenType == 4)
-			this->tweenGraph(mix, animCurveChange);
+			this->tweenGraph(mixA, mix, animCurveChange);
 
 		else
-			this->tweenKeyed(mix, animCurveChange);
+			this->tweenKeyed(mixA, mix, animCurveChange);
 	}
 
 	else
-		tweenStoredPlugs(mix);
+		tweenStoredPlugs(mixA, mix);
 
 }
 
 
-void Tweener::tweenKeyed(const double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenKeyed(const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange) {
 	
 	MPlugArray attrs;
 		
 	MAnimUtil::findAnimatedPlugs(this->nodes, attrs);
-	this->collectAndTweenFnCurves(attrs, (1.0 - mix), mix, animCurveChange);
+	this->collectAndTweenFnCurves(attrs, mixA, mixB, animCurveChange);
 }
 
 
-void Tweener::tweenMarked(const double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenMarked(const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange) {
 	MStringArray attrNames;
 	MGlobal::executeCommand("channelBox -query -selectedMainAttributes mainChannelBox;", attrNames);
 
 	if (attrNames.length())
-		this->tweenAttrNames(attrNames, mix, animCurveChange);
+		this->tweenAttrNames(attrNames, mixA, mixB, animCurveChange);
 }
 
 
-void Tweener::tweenManipulator(const double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenManipulator(const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange) {
 	MStringArray attrNames;
 	attrNames = this->getAttrsFromManip();
 
 	if (attrNames.length())
-		tweenAttrNames(attrNames, mix, animCurveChange);
+		tweenAttrNames(attrNames, mixA, mixB, animCurveChange);
 }
 
 
-void Tweener::tweenCharacter(const double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenCharacter(const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange) {
 	MString characterName;
 	MGlobal::executeCommand("selectionConnection -query -object highlightList;", characterName);
 
@@ -98,12 +100,12 @@ void Tweener::tweenCharacter(const double &mix, MAnimCurveChange *animCurveChang
 		MPlugArray attrs;
 		fnCharacter.getMemberPlugs(attrs);
 
-		this->collectAndTweenFnCurves(attrs, (1.0 - mix), mix, animCurveChange);
+		this->collectAndTweenFnCurves(attrs, mixA, mixB, animCurveChange);
 	}
 }
 
 
-void Tweener::tweenGraph(const double &mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenGraph(const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange) {
 	MStringArray attrNames;
 	MGlobal::executeCommand("keyframe -query -name", attrNames);
 	
@@ -114,7 +116,7 @@ void Tweener::tweenGraph(const double &mix, MAnimCurveChange *animCurveChange){
 	for (unsigned int i=0; i < length; i++){
 		sel.add(attrNames[i]);
 		sel.getDependNode(i, animCurve);
-		this->tweenPlug(animCurve, (1.0 - mix), mix, animCurveChange);
+		this->tweenPlug(animCurve, mixA, mixB, animCurveChange);
 	}
 }
 
@@ -130,7 +132,7 @@ MObject Tweener::getCharacterNode(const MString &name){
 }
 
 
-void Tweener::tweenAttrNames(const MStringArray &attrNames, const double mix, MAnimCurveChange *animCurveChange){
+void Tweener::tweenAttrNames(const MStringArray &attrNames, const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange) {
 	MDagPath dagNode;
 
 	unsigned int length1 = this->nodes.length();
@@ -156,7 +158,7 @@ void Tweener::tweenAttrNames(const MStringArray &attrNames, const double mix, MA
 
 			length3 = this->objArray.length();
 			for (unsigned int k = 0; k < length3; k++) {
-				this->tweenPlug(this->objArray[k], (1.0 - mix), mix, animCurveChange);
+				this->tweenPlug(this->objArray[k], mixA, mixB, animCurveChange);
 			}
 
 		}
@@ -256,7 +258,7 @@ std::array<double, 2> Tweener::collectKeyValues(MFnAnimCurve &fnAnimCurve){
 }
 
 
-void Tweener::tweenPlug(const MObject &plug, const double mixA, const double mixB, MAnimCurveChange *animCurveChange){
+void Tweener::tweenPlug(const MObject &plug, const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange){
 
 	this->fnAnimCurve.setObject(plug);
 	
@@ -268,13 +270,13 @@ void Tweener::tweenPlug(const MObject &plug, const double mixA, const double mix
 }
 
 
-void Tweener::tweenStoredPlugs(const double mixB){
+void Tweener::tweenStoredPlugs(const double &mixA, const double &mixB) {
 
 	size_t numPlugs = this->animPlugs.size();
 	for (size_t i=0; i < numPlugs; i++) {
 		
 		this->fnAnimCurve.setObject(this->animPlugs[i]);
-		this->fnAnimCurve.addKey(this->currentTime, this->mixValues(this->animValues[i], (1.0 - mixB), mixB),
+		this->fnAnimCurve.addKey(this->currentTime, this->mixValues(this->animValues[i], mixA, mixB),
   								 MFnAnimCurve::kTangentAuto, MFnAnimCurve::kTangentAuto, nullptr);
 	}
 }
