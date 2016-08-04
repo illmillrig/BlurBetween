@@ -1,5 +1,5 @@
 
-#include "BlurTweenUI.h"
+#include "BlurBetweenUI.h"
 #include "BlurBetweenCmd.h"
 #include <maya/MFnPlugin.h>
 

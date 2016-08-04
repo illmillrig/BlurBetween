@@ -33,7 +33,7 @@ BlurBetween::~BlurBetween(){ }
 MStatus BlurBetween::doIt(const MArgList &argList ){
 	this->argParser(argList);
 	double mix = this->mix/100;
-	bTween.tweenAnimPlugs(mix, this->tweenType, this->fresh, &this->animCurveChange);
+	BlurBetween::bTween.tweenAnimPlugs(mix, this->tweenType, this->fresh, &this->animCurveChange);
 	return MS::kSuccess;
 }
 

@@ -4,12 +4,18 @@
 #include <QtGui/QWidget>
 #include <QtGui/QSpinBox>
 
-#include "blurBetween_ui.h"
-#include "Tweener.h"
 
+// TODO: Figure how to save the output of AUTOUI into src dir
+#include "ui_BlurBetween.h"
+
+
+
+#include "Tweener.h"
 #include <maya/MPxCommand.h>
 #include <maya/MArgList.h>
 #include <maya/MMessage.h>
+
+#include <QtGui/QPushButton>
 
 
 //--------------------------------------------------------------------------------
@@ -45,12 +51,11 @@ public:
 // BLURTWEEN UI
 //--------------------------------------------------------------------------------
 
-class BlurTweenUI : public QWidget, public Ui::BlurTween{
-// /usr/autodesk/maya2016.5/bin/uic -o BlurBetween/blurBetween_ui.h blurBetween.ui
+class BlurBetweenUI : public QWidget, private Ui::BlurTween{
     Q_OBJECT
 public:
-    BlurTweenUI( QWidget *parent=0 );
-    virtual ~BlurTweenUI();
+    BlurBetweenUI( QWidget *parent=0 );
+    virtual ~BlurBetweenUI();
     virtual void setDefaults();
     void moveToPosition();
 
@@ -104,7 +109,8 @@ public:
     bool isUndoable() const { return false; }
 
 public:
-    static QPointer<BlurTweenUI> blurTweenWindow;
+    static QPointer<BlurBetweenUI> blurTweenWindow;
 };
+
 
 

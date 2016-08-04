@@ -21,10 +21,8 @@ void Tweener::setCurrentTime(){
 void Tweener::setDefaults(){
 	this->animPlugs.clear();
 	this->animValues.clear();
-	
+	this->setCurrentTime();
 	MGlobal::getActiveSelectionList(this->nodes);
-	
-	setCurrentTime();
 }
 
 
@@ -57,14 +55,11 @@ void Tweener::tweenAnimPlugs(const double mix, const int &tweenType, const bool 
 
 	else
 		tweenStoredPlugs(mixA, mix);
-
 }
 
 
 void Tweener::tweenKeyed(const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange) {
-	
 	MPlugArray attrs;
-		
 	MAnimUtil::findAnimatedPlugs(this->nodes, attrs);
 	this->collectAndTweenFnCurves(attrs, mixA, mixB, animCurveChange);
 }
@@ -134,9 +129,8 @@ MObject Tweener::getCharacterNode(const MString &name){
 
 void Tweener::tweenAttrNames(const MStringArray &attrNames, const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange) {
 	MDagPath dagNode;
-
 	unsigned int length1 = this->nodes.length();
-	unsigned int length2 = 0;
+	unsigned int length2 = attrNames.length();
 	unsigned int length3 = 0;
 
 	for (unsigned int i=0; i < length1; i++){
@@ -148,7 +142,6 @@ void Tweener::tweenAttrNames(const MStringArray &attrNames, const double &mixA, 
 		
 		this->fnDepend.setObject(dagNode.node());
 
-		length2 = attrNames.length();
 		for (unsigned int j=0; j < length2; j++){
 
 			// TODO: This seems like duplicate code
@@ -175,21 +168,21 @@ MStringArray Tweener::getAttrsFromManip(){
 		return attrNames;
 
 	else if (ctx == "moveSuperContext") {
-		attrNames.append(MString("tx"));
-		attrNames.append(MString("ty"));
-		attrNames.append(MString("tz"));
+		attrNames.append("tx");
+		attrNames.append("ty");
+		attrNames.append("tz");
 	}
 
 	else if (ctx == "RotateSuperContext") {
-		attrNames.append(MString("rx"));
-		attrNames.append(MString("ry"));
-		attrNames.append(MString("rz"));
+		attrNames.append("rx");
+		attrNames.append("ry");
+		attrNames.append("rz");
 	}
 
 	else if (ctx == "scaleSuperContext") {
-		attrNames.append(MString("sx"));
-		attrNames.append(MString("sy"));
-		attrNames.append(MString("sz"));
+		attrNames.append("sx");
+		attrNames.append("sy");
+		attrNames.append("sz");
 	}
 
 	return attrNames;
@@ -198,7 +191,6 @@ MStringArray Tweener::getAttrsFromManip(){
 
 void Tweener::collectAndTweenFnCurves(const MPlugArray &connections, const double &mixA, const double &mixB,
 									  MAnimCurveChange *animCurveChange){
-
 	unsigned int length1 = connections.length();
 	unsigned int length2 = 0;
 
@@ -259,11 +251,11 @@ std::array<double, 2> Tweener::collectKeyValues(MFnAnimCurve &fnAnimCurve){
 
 
 void Tweener::tweenPlug(const MObject &plug, const double &mixA, const double &mixB, MAnimCurveChange *animCurveChange){
-
 	this->fnAnimCurve.setObject(plug);
-	
 	this->animPlugs.push_back(plug);
 	this->animValues.push_back(this->collectKeyValues(fnAnimCurve));
+
+	// TODO: is Auto tangents fine here?, or should I use the same tangents of the keys being tweened between
 
 	this->fnAnimCurve.addKey(this->currentTime, this->mixValues(this->animValues.back(), mixA, mixB),
 							 MFnAnimCurve::kTangentAuto, MFnAnimCurve::kTangentAuto, animCurveChange);
@@ -271,10 +263,8 @@ void Tweener::tweenPlug(const MObject &plug, const double &mixA, const double &m
 
 
 void Tweener::tweenStoredPlugs(const double &mixA, const double &mixB) {
-
 	size_t numPlugs = this->animPlugs.size();
 	for (size_t i=0; i < numPlugs; i++) {
-		
 		this->fnAnimCurve.setObject(this->animPlugs[i]);
 		this->fnAnimCurve.addKey(this->currentTime, this->mixValues(this->animValues[i], mixA, mixB),
   								 MFnAnimCurve::kTangentAuto, MFnAnimCurve::kTangentAuto, nullptr);

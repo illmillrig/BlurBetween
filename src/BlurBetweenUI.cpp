@@ -1,5 +1,5 @@
 
-#include "BlurTweenUI.h"
+#include "BlurBetweenUI.h"
 #include "BlurBetweenCmd.h"
 
 #include <QtGui/QPushButton>
@@ -9,7 +9,6 @@
 #include <maya/MGlobal.h>
 #include <maya/MQtUtil.h>
 #include <maya/MAnimCurveChange.h>
-#include <maya/MEventMessage.h>
 
 
 //--------------------------------------------------------------------------------
@@ -44,7 +43,7 @@ bool ViewRefreshFilter::eventFilter(QObject *obj, QEvent *event){
 // BLURTWEEN UI
 //--------------------------------------------------------------------------------
 
-BlurTweenUI::BlurTweenUI(QWidget *parent) : QWidget(parent) {
+BlurBetweenUI::BlurBetweenUI(QWidget *parent) : QWidget(parent) {
     setupUi(this);
     this->createCustomWidgets();
     this->createConnections();
@@ -54,7 +53,7 @@ BlurTweenUI::BlurTweenUI(QWidget *parent) : QWidget(parent) {
 }
 
 
-BlurTweenUI::~BlurTweenUI() {
+BlurBetweenUI::~BlurBetweenUI() {
     if (this->uiTweenSLDR != nullptr)
         delete this->uiTweenSLDR;
 
@@ -68,7 +67,7 @@ BlurTweenUI::~BlurTweenUI() {
 }
 
 
-void BlurTweenUI::setDefaults() {
+void BlurBetweenUI::setDefaults() {
     this->setFixedSize(this->sizeHint());
     this->setWindowFlags(Qt::FramelessWindowHint);
 
@@ -84,7 +83,7 @@ void BlurTweenUI::setDefaults() {
 }
 
 
-void BlurTweenUI::createEventFilters() {
+void BlurBetweenUI::createEventFilters() {
     QWidget *mayaWindow = MQtUtil::mainWindow();
     QWidget *viewPanes = mayaWindow->findChild <QWidget*> ("viewPanes");
 
@@ -92,7 +91,7 @@ void BlurTweenUI::createEventFilters() {
 }
 
 
-void BlurTweenUI::destroyEventFilters() {
+void BlurBetweenUI::destroyEventFilters() {
     QWidget *mayaWindow = MQtUtil::mainWindow();
     QWidget *viewPanes = mayaWindow->findChild <QWidget*> ("viewPanes");
 
@@ -100,7 +99,7 @@ void BlurTweenUI::destroyEventFilters() {
 }
 
 
-void BlurTweenUI::createConnections() {
+void BlurBetweenUI::createConnections() {
 
     // Undos
     this->connect(this->uiTweenSLDR, SIGNAL( sliderPressed() ), SLOT( openUndoChunk() ));
@@ -131,7 +130,7 @@ void BlurTweenUI::createConnections() {
 }
 
 
-void BlurTweenUI::createCustomWidgets() {
+void BlurBetweenUI::createCustomWidgets() {
 
     this->uiTweenSPN = new BlurSpin(this);
     this->uiTweenSPN->setMinimumWidth(50);
@@ -152,70 +151,70 @@ void BlurTweenUI::createCustomWidgets() {
 }
 
 
-void BlurTweenUI::openUndoChunk() const {
+void BlurBetweenUI::openUndoChunk() const {
     MGlobal::executeCommand("undoInfo -chunkName blurTweenUndo -openChunk;");
 }
 
 
-void BlurTweenUI::closeUndoChunk() const {
+void BlurBetweenUI::closeUndoChunk() const {
     MGlobal::executeCommand("undoInfo -chunkName blurTweenUndo -closeChunk;");
 }
 
 
 // This seems strange I know, but the logic is this:
-// we need to make calls through the commands layer with MGlobal::executeCommand("blurTween") so that tweens get added to the undo que. But we don't
-// really always need undos.  like while we're sliding.  so we keep a ptr to the static tweener class of the BlurBetween MpxCommand
-// in order for the tweener class to tween with existing information and be fast while sliding.
+// we need to make calls through the commands layer with MGlobal::executeCommand("blurTween") so that tweens get added to the undo que.
+// But we don't really always need undos.  like while we're sliding.  so we keep a ptr to the static tweener class of the src
+// MpxCommand in order for the tweener class to tween with existing information and be fast while sliding.
 
 
-void BlurTweenUI::onClicked() {
+void BlurBetweenUI::onClicked() {
     this->fullTween(this->uiTweenSPN->value(), true);
 }
 
 
-void BlurTweenUI::onSliderClicked() {
+void BlurBetweenUI::onSliderClicked() {
     this->fullTween(this->uiTweenSLDR->value(), true);
 }
 
 
-void BlurTweenUI::onSeek() {
+void BlurBetweenUI::onSeek() {
     int seekValue = sender()->property("mixValue").toInt();
     this->fullTween(seekValue, true);
 }
 
 
-void BlurTweenUI::onSlide() {
+void BlurBetweenUI::onSlide() {
     int mix = this->uiTweenSLDR->value();
     this->quickTween(mix, false);
 }
 
 
-void BlurTweenUI::onSlide(const int &mix) {
+void BlurBetweenUI::onSlide(const int &mix) {
     this->quickTween(mix, false);
 }
 
 
-void BlurTweenUI::onRelease() {
+void BlurBetweenUI::onRelease() {
     int mix = this->uiTweenSLDR->value();
     this->fullTween(mix, false);
 }
 
 
-void BlurTweenUI::onRelease(const int &mix) {
+void BlurBetweenUI::onRelease(const int &mix) {
     this->fullTween(mix, false);
 }
 
 
-void BlurTweenUI::quickTween(const int &mix, const bool &fresh) {
+void BlurBetweenUI::quickTween(const int &mix, const bool &fresh) {
     BlurBetween::bTween.tweenAnimPlugs(mix/100.0, this->tweenType, fresh, &this->nullAnimCurveChange);
 }
 
 
-void BlurTweenUI::fullTween(const int &mix, const bool &fresh) {
+void BlurBetweenUI::fullTween(const int &mix, const bool &fresh) {
 
    this->setTweenType();
 
-    // TODO: This could probably be cleaned up/optimized a bit.
+    // TODO: This could probably be cleaned up/optimized a bit :)
 
     MString cmd ("blurTween");
 
@@ -236,39 +235,39 @@ void BlurTweenUI::fullTween(const int &mix, const bool &fresh) {
 }
 
 
-void BlurTweenUI::setSliderValue() {
+void BlurBetweenUI::setSliderValue() {
     this->uiTweenSLDR->setValue(this->uiTweenSPN->value());
 }
 
 
-void BlurTweenUI::setSliderValue(const int &mix) {
+void BlurBetweenUI::setSliderValue(const int &mix) {
     this->uiTweenSLDR->setValue(mix);
 }
 
 
-void BlurTweenUI::setSpinValue() {
+void BlurBetweenUI::setSpinValue() {
     this->uiTweenSPN->setValue(this->uiTweenSLDR->value());
 }
 
 
-void BlurTweenUI::setSpinValue(const int &mix) {
+void BlurBetweenUI::setSpinValue(const int &mix) {
     this->uiTweenSPN->setValue(mix);
 }
 
 
-void BlurTweenUI::setSliderValueFromSeek() {
+void BlurBetweenUI::setSliderValueFromSeek() {
     int seekValue = sender()->property("mixValue").toInt();
     this->uiTweenSLDR->setValue(seekValue);
 }
 
 
-void BlurTweenUI::setSpinValueFromSeek() {
+void BlurBetweenUI::setSpinValueFromSeek() {
     int seekValue = sender()->property("mixValue").toInt();
     this->uiTweenSPN->setValue(seekValue);
 }
 
 
-void BlurTweenUI::setTweenType() {
+void BlurBetweenUI::setTweenType() {
 
     if (this->uiKeyedCHK->isChecked()){
         this->tweenType = 0;
@@ -300,8 +299,8 @@ void BlurTweenUI::setTweenType() {
 }
 
 
-void BlurTweenUI::moveToPosition() {
-    QWidget *mayaWindow = MQtUtil::mainWindow();
+void BlurBetweenUI::moveToPosition() {
+    QWidget *mayaWindow = this->parentWidget();
     QWidget *viewPanes = mayaWindow->findChild <QWidget*> ("viewPanes");
 
     QRect viewRect = viewPanes->rect();
@@ -310,7 +309,7 @@ void BlurTweenUI::moveToPosition() {
     QPoint topRight = viewPanes->mapTo(mayaWindow, viewRect.topRight());
     QPoint center = (topLeft + topRight) / 2;
 
-    center.setY(center.y() + (this->height()/2) + 10);
+    center.setY(center.y() + (this->height()/2 + 3));
     center.setX(center.x() - (this->width()/2));
 
     this->move(center);
@@ -322,7 +321,7 @@ void BlurTweenUI::moveToPosition() {
 // BLURTWEEN UI COMMAND
 //--------------------------------------------------------------------------------
 
-QPointer<BlurTweenUI>  BlurTweenUICmd::blurTweenWindow;
+QPointer<BlurBetweenUI>  BlurTweenUICmd::blurTweenWindow;
 
 void* BlurTweenUICmd::creator() {
     return new BlurTweenUICmd;
@@ -337,7 +336,7 @@ void BlurTweenUICmd::cleanup(){
 
 MStatus BlurTweenUICmd::doIt(const MArgList &args ){
     if (blurTweenWindow == nullptr)
-        blurTweenWindow = new BlurTweenUI(MQtUtil::mainWindow());
+        blurTweenWindow = new BlurBetweenUI(MQtUtil::mainWindow());
 
     else {
         blurTweenWindow->showNormal();
